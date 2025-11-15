@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>⟡ Multi-Agent Systems, Illuminated</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@400;600;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-dark: #0a0a0a;
+            --bg-section: #1a1a1a;
+            --text-primary: #e8e6e3;
+            --text-secondary: #a8a6a3;
+            --accent-beige: #d4c5b0;
+            --accent-gold: #f4e5c3;
+            --spacing-xl: 8rem;
+            --spacing-lg: 4rem;
+            --spacing-md: 2rem;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            line-height: 1.8;
+            overflow-x: hidden;
+        }
+
+        /* Sound Toggle Button */
+        .sound-toggle {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            z-index: 1000;
+            background: rgba(212, 197, 176, 0.1);
+            border: 2px solid var(--accent-beige);
+            color: var(--accent-beige);
+            padding: 0.75rem 1.5rem;
+            border-radius: 2rem;
+            cursor: pointer;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .sound-toggle:hover {
+            background: rgba(212, 197, 176, 0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(212, 197, 176, 0.3);
+        }
+
+        .sound-toggle.active {
+            background: var(--accent-beige);
+            color: var(--bg-dark);
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 2rem;
+            position: relative;
+            overflow: hidden;
+            background: radial-gradient(circle at 50% 50%, rgba(212, 197, 176, 0.05) 0%, var(--bg-dark) 70%);
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 50% 50%, rgba(212, 197, 176, 0.08) 0%, transparent 60%);
+            animation: pulse 8s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.5; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.1); }
+        }
+
+        .hero-image-container {
+            position: relative;
+            max-width: 400px;
+            width: 100%;
+            margin-bottom: 3rem;
+            opacity: 0;
+            animation: fadeInScale 2s ease-out forwards;
+        }
+
+        .hero-image {
+            width: 100%;
+            height: auto;
+            filter: drop-shadow(0 0 60px rgba(212, 197, 176, 0.4));
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes fadeInScale {
+            to { opacity: 1; }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        h1 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: clamp(2.5rem, 6vw, 5rem);
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            color: var(--accent-gold);
+            opacity: 0;
+            animation: fadeIn 2s ease-out 0.5s forwards;
+            letter-spacing: -0.02em;
+        }
+
+        .hero-text {
+            max-width: 900px;
+            font-size: clamp(1.1rem, 2vw, 1.35rem);
+            color: var(--text-secondary);
+            line-height: 2;
+            opacity: 0;
+            animation: fadeIn 2s ease-out 1s forwards;
+        }
+
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+
+        /* Main Content Sections */
+        section {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: var(--spacing-xl) var(--spacing-md);
+            opacity: 0;
+            transform: translateY(40px);
+            transition: all 1s ease-out;
+        }
+
+        section.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .section-icon {
+            font-size: 3rem;
+            color: var(--accent-beige);
+            margin-bottom: 1rem;
+            display: inline-block;
+            text-shadow: 0 0 30px rgba(212, 197, 176, 0.5);
+        }
+
+        h2 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: clamp(2rem, 4vw, 3rem);
+            margin-bottom: 1.5rem;
+            color: var(--accent-gold);
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+
+        .section-subtitle {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        /* Content Grid */
+        .content-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 4rem;
+            align-items: center;
+            margin-top: 3rem;
+        }
+
+        .content-text {
+            color: var(--text-secondary);
+            font-size: 1.15rem;
+            line-height: 1.9;
+        }
+
+        .content-text p + p {
+            margin-top: 1.5rem;
+        }
+
+        .emphasis {
+            color: var(--accent-beige);
+            font-weight: 600;
+        }
+
+        /* Image Containers */
+        .image-container {
+            position: relative;
+            width: 100%;
+            border-radius: 1.5rem;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+            transition: all 0.4s ease;
+            border: 1px solid rgba(212, 197, 176, 0.15);
+            background: var(--bg-section);
+        }
+
+        .image-container:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 30px 80px rgba(212, 197, 176, 0.2);
+        }
+
+        .image-container img {
+            width: 100%;
+            height: auto;
+            display: block;
+            transition: transform 0.4s ease;
+        }
+
+        .image-container:hover img {
+            transform: scale(1.05);
+        }
+
+        /* Fallback for missing images */
+        .image-placeholder {
+            width: 100%;
+            aspect-ratio: 16/9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, rgba(212, 197, 176, 0.1) 0%, rgba(212, 197, 176, 0.05) 100%);
+            border-radius: 1.5rem;
+            color: var(--accent-beige);
+            font-size: 4rem;
+            border: 2px dashed rgba(212, 197, 176, 0.3);
+        }
+
+        /* Image Duo Grid */
+        .image-duo {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        /* Dividers */
+        .divider {
+            height: 2px;
+            background: linear-gradient(to right, transparent, var(--accent-beige), transparent);
+            margin: var(--spacing-xl) auto;
+            max-width: 600px;
+            opacity: 0.3;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--text-secondary);
+            font-size: 1rem;
+            border-top: 1px solid rgba(212, 197, 176, 0.1);
+            background: var(--bg-section);
+        }
+
+        .footer-icon {
+            max-width: 120px;
+            margin-bottom: 1.5rem;
+            opacity: 0.7;
+            filter: drop-shadow(0 0 20px rgba(212, 197, 176, 0.3));
+        }
+
+        .confidence {
+            text-align: center;
+            margin-top: 4rem;
+            color: var(--accent-beige);
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1rem;
+            opacity: 0.8;
+            font-weight: 500;
+        }
+
+        /* Scroll Indicator */
+        .scroll-indicator {
+            position: absolute;
+            bottom: 3rem;
+            left: 50%;
+            transform: translateX(-50%);
+            color: var(--accent-beige);
+            font-size: 2.5rem;
+            animation: bounce 2s infinite;
+            opacity: 0.7;
+            cursor: pointer;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateX(-50%) translateY(0); }
+            50% { transform: translateX(-50%) translateY(15px); }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            :root {
+                --spacing-xl: 4rem;
+                --spacing-lg: 2rem;
+            }
+
+            .sound-toggle {
+                top: 1rem;
+                right: 1rem;
+                padding: 0.5rem 1rem;
+                font-size: 0.8rem;
+            }
+
+            .content-grid {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+            .image-duo {
+                grid-template-columns: 1fr;
+            }
+
+            section {
+                padding: 3rem 1.5rem;
+            }
+        }
+
+        /* Loading State */
+        img {
+            background: linear-gradient(135deg, rgba(212, 197, 176, 0.05) 0%, rgba(212, 197, 176, 0.02) 100%);
+        }
+    </style>
+</head>
+<body>
+    <button class="sound-toggle" id="soundToggle">🔇 Activate Ambient Sound</button>
+
+    <!-- Hero Section -->
+    <div class="hero">
+        <div class="hero-image-container">
+            <img src="STAR beige.png" alt="Multi-agent coordination starburst" class="hero-image" onerror="this.parentElement.innerHTML='<div class=\'image-placeholder\'>✦</div>'">
+        </div>
+        <h1>⟡ Multi-Agent Systems, Illuminated</h1>
+        <p class="hero-text">
+            The soft beige starburst on a dark field introduces the spark of coordination: many simple lines radiating outward yet anchored in a single origin. This is the essence of a multi-agent system. Instead of one oversized model doing everything, we orchestrate several focused agents that collaborate with precision.
+        </p>
+        <div class="scroll-indicator" onclick="document.getElementById('user').scrollIntoView({behavior: 'smooth'})">↓</div>
+    </div>
+
+    <!-- User at the Center -->
+    <section id="user">
+        <div class="section-header">
+            <div class="section-icon">✦</div>
+            <h2>The User at the Center</h2>
+        </div>
+        <div class="content-grid">
+            <div class="content-text">
+                <p>
+                    The beige user icon marks the <span class="emphasis">anchor of the entire system</span>. Every agent, connector, workflow and safeguard exists to serve this single point.
+                </p>
+                <p>
+                    The experience begins with your intent. From that intent, the agents negotiate how to achieve your goal, always maintaining clarity, control and transparency.
+                </p>
+            </div>
+            <div class="image-container">
+                <img src="USER.png" alt="User at the center of the system" onerror="this.parentElement.innerHTML='<div class=\'image-placeholder\'>👤</div>'">
+            </div>
+        </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- Core Loop -->
+    <section id="core-loop">
+        <div class="section-header">
+            <div class="section-icon">❖</div>
+            <h2>Planner, Executor, Validator</h2>
+            <p class="section-subtitle">The Core Loop</p>
+        </div>
+        <div class="content-grid">
+            <div class="image-container">
+                <img src="Multi agents.png" alt="Multi-agent core loop diagram" onerror="this.parentElement.innerHTML='<div class=\'image-placeholder\'>⚙️</div>'">
+            </div>
+            <div class="content-text">
+                <p>
+                    The vertical diagram shows the <span class="emphasis">planner, executor and validator</span>, linked in sequence. To the side, a small sub-agent symbol and a tools panel illustrate how actions are dispatched.
+                </p>
+                <p>
+                    The planner breaks down your request, the executor performs the actions or tool calls, and the validator ensures correctness before returning results. This triad mirrors real-world workflows and reduces errors.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- MCP -->
+    <section id="mcp">
+        <div class="section-header">
+            <div class="section-icon">◈</div>
+            <h2>MCP as the Connective Tissue</h2>
+            <p class="section-subtitle">Model Context Protocol</p>
+        </div>
+        <div class="content-grid">
+            <div class="content-text">
+                <p>
+                    The looping beige line represents the <span class="emphasis">Model Context Protocol</span>. It symbolizes how external tools, APIs and systems connect to agents in a clean and secure structure.
+                </p>
+                <p>
+                    MCP exposes tools, resources and capabilities in a standard form that the planner can reason about, the executor can call, and the validator can review.
+                </p>
+            </div>
+            <div class="image-container">
+                <img src="MCP.png" alt="Model Context Protocol diagram" onerror="this.parentElement.innerHTML='<div class=\'image-placeholder\'>🔗</div>'">
+            </div>
+        </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- Security -->
+    <section id="security">
+        <div class="section-header">
+            <div class="section-icon">✦</div>
+            <h2>Trust, Encryption and Secure Boundaries</h2>
+        </div>
+        <div class="content-text" style="text-align: center; max-width: 900px; margin: 0 auto 3rem;">
+            <p>
+                The lock-with-star icon emphasizes <span class="emphasis">least-privilege access</span> and visibility into tool calls. The shield icon reinforces systemic protection: encrypted communication, controlled permissions, and strict boundaries around MCP servers.
+            </p>
+        </div>
+        <div class="image-duo">
+            <div class="image-container">
+                <img src="encryption.png" alt="Encryption and secure access" onerror="this.parentElement.innerHTML='<div class=\'image-placeholder\'>🔒</div>'">
+            </div>
+            <div class="image-container">
+                <img src="security.png" alt="Security shield" onerror="this.parentElement.innerHTML='<div class=\'image-placeholder\'>🛡️</div>'">
+            </div>
+        </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- Governance -->
+    <section id="governance">
+        <div class="section-header">
+            <div class="section-icon">❖</div>
+            <h2>Governance, Checklists and Guardrails</h2>
+        </div>
+        <div class="content-grid">
+            <div class="image-container">
+                <img src="FILE.png" alt="Governance checklist" onerror="this.parentElement.innerHTML='<div class=\'image-placeholder\'>📋</div>'">
+            </div>
+            <div class="content-text">
+                <p>
+                    The beige checklist page icon illustrates <span class="emphasis">operational discipline</span>. Each workflow is governed by constraints: allowed data, tool scopes, approval steps, and fallback logic.
+                </p>
+                <p>
+                    The validator agent uses these rules to determine whether outputs are acceptable or whether the loop must run again.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- Perspectives -->
+    <section id="perspectives">
+        <div class="section-header">
+            <div class="section-icon">◈</div>
+            <h2>Perspectives: Engine vs Dashboard</h2>
+        </div>
+        <div class="content-grid">
+            <div class="content-text">
+                <p>
+                    The paired rectangles represent <span class="emphasis">dual perspectives</span>. One is the deep system view used by engineers, showing agents, tools and logs.
+                </p>
+                <p>
+                    The other is a clear dashboard for business users. Both perspectives observe the same workflows at different levels of abstraction.
+                </p>
+            </div>
+            <div class="image-container">
+                <img src="PResentation.png" alt="Dual perspectives diagram" onerror="this.parentElement.innerHTML='<div class=\'image-placeholder\'>📊</div>'">
+            </div>
+        </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- Reliability -->
+    <section id="reliability">
+        <div class="section-header">
+            <div class="section-icon">✦</div>
+            <h2>Reliability and Repeatability</h2>
+        </div>
+        <div class="content-grid">
+            <div class="image-container">
+                <img src="STAR 2.png" alt="Symmetrical star representing reliability" onerror="this.parentElement.innerHTML='<div class=\'image-placeholder\'>⭐</div>'">
+            </div>
+            <div class="content-text">
+                <p>
+                    The symmetrical eight-spoke star symbolizes <span class="emphasis">stable, repeatable behavior</span>. When a workflow becomes reliable, it can be turned into a reusable skill that other teams call with confidence.
+                </p>
+                <p>
+                    The symmetry reflects deterministic, auditable execution.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- Orchestration -->
+    <section id="orchestration">
+        <div class="section-header">
+            <div class="section-icon">❖</div>
+            <h2>Background Process: Quiet Orchestration</h2>
+        </div>
+        <div class="content-grid">
+            <div class="content-text">
+                <p>
+                    The minimal starburst floating in a large black field represents <span class="emphasis">silent, unobtrusive orchestration</span>.
+                </p>
+                <p>
+                    Once configured, agents coordinate in the background while the user sees only meaningful summaries and requests for approval.
+                </p>
+            </div>
+            <div class="image-container">
+                <img src="Background.png" alt="Background orchestration" onerror="this.parentElement.innerHTML='<div class=\'image-placeholder\'>🌌</div>'">
+            </div>
+        </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- Closing -->
+    <section id="closing">
+        <div class="section-header">
+            <div class="section-icon">◈</div>
+            <h2>Humans and Agents, Working Together</h2>
+        </div>
+        <div class="content-grid">
+            <div class="image-container">
+                <img src="USER.png" alt="User surrounded by system components" onerror="this.parentElement.innerHTML='<div class=\'image-placeholder\'>🤝</div>'">
+            </div>
+            <div class="content-text">
+                <p>
+                    The final image returns to the user icon, now conceptually surrounded by the lock, shield, MCP connector, checklist, star and planner–executor–validator loop.
+                </p>
+                <p>
+                    The closing message emphasizes <span class="emphasis">partnership</span>: agents handle complexity, humans set direction and approve actions.
+                </p>
+            </div>
+        </div>
+        <div class="confidence">confidence 0.82</div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <img src="STAR beige.png" alt="Multi-agent systems" class="footer-icon" onerror="this.style.display='none'">
+        <p style="font-size: 1.1rem; font-weight: 500; color: var(--accent-gold);">Multi-Agent Systems, Illuminated</p>
+        <p style="margin-top: 0.5rem; opacity: 0.6;">Orchestrating intelligence through collaboration</p>
+    </footer>
+
+    <script>
+        // Intersection Observer for scroll animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -100px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('section').forEach(section => {
+            observer.observe(section);
+        });
+
+        // Hide scroll indicator after scrolling
+        let scrolled = false;
+        window.addEventListener('scroll', () => {
+            if (!scrolled && window.scrollY > 200) {
+                const indicator = document.querySelector('.scroll-indicator');
+                if (indicator) {
+                    indicator.style.opacity = '0';
+                    indicator.style.pointerEvents = 'none';
+                }
+                scrolled = true;
+            }
+        });
+
+        // Web Audio API for ambient sound
+        let audioContext;
+        let oscillators = [];
+        let noiseSource;
+        let masterGain;
+        let isPlaying = false;
+
+        const soundToggle = document.getElementById('soundToggle');
+
+        function createAmbientSound() {
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+
+            // Master gain node
+            masterGain = audioContext.createGain();
+            masterGain.gain.value = 0;
+            masterGain.connect(audioContext.destination);
+
+            // Create harmonic drone (A minor pentatonic)
+            const frequencies = [
+                110.00,  // A2
+                164.81,  // E3
+                220.00,  // A3
+                293.66,  // D4
+                329.63,  // E4
+                440.00   // A4
+            ];
+
+            frequencies.forEach((freq, index) => {
+                // Main oscillator
+                const osc = audioContext.createOscillator();
+                const oscGain = audioContext.createGain();
+
+                osc.type = 'sine';
+                osc.frequency.value = freq;
+
+                // Volume decreases with higher frequencies
+                oscGain.gain.value = 0.06 / (index + 1);
+
+                // Slight detuning for warmth
+                osc.detune.value = (Math.random() - 0.5) * 3;
+
+                // Create LFO for gentle amplitude modulation
+                const lfo = audioContext.createOscillator();
+                const lfoGain = audioContext.createGain();
+
+                lfo.type = 'sine';
+                lfo.frequency.value = 0.05 + (Math.random() * 0.05); // Very slow
+                lfoGain.gain.value = 0.015;
+
+                lfo.connect(lfoGain);
+                lfoGain.connect(oscGain.gain);
+
+                osc.connect(oscGain);
+                oscGain.connect(masterGain);
+
+                osc.start();
+                lfo.start();
+
+                oscillators.push({ osc, lfo });
+            });
+
+            // Create pink-ish noise for texture
+            const bufferSize = 4 * audioContext.sampleRate;
+            const noiseBuffer = audioContext.createBuffer(1, bufferSize, audioContext.sampleRate);
+            const output = noiseBuffer.getChannelData(0);
+
+            // Generate pink noise (1/f noise)
+            let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
+            for (let i = 0; i < bufferSize; i++) {
+                const white = Math.random() * 2 - 1;
+                b0 = 0.99886 * b0 + white * 0.0555179;
+                b1 = 0.99332 * b1 + white * 0.0750759;
+                b2 = 0.96900 * b2 + white * 0.1538520;
+                b3 = 0.86650 * b3 + white * 0.3104856;
+                b4 = 0.55000 * b4 + white * 0.5329522;
+                b5 = -0.7616 * b5 - white * 0.0168980;
+                output[i] = b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362;
+                output[i] *= 0.11;
+                b6 = white * 0.115926;
+            }
+
+            noiseSource = audioContext.createBufferSource();
+            noiseSource.buffer = noiseBuffer;
+            noiseSource.loop = true;
+
+            const noiseFilter = audioContext.createBiquadFilter();
+            noiseFilter.type = 'lowpass';
+            noiseFilter.frequency.value = 300;
+            noiseFilter.Q.value = 0.5;
+
+            const noiseGain = audioContext.createGain();
+            noiseGain.gain.value = 0.012;
+
+            noiseSource.connect(noiseFilter);
+            noiseFilter.connect(noiseGain);
+            noiseGain.connect(masterGain);
+            noiseSource.start();
+
+            // Fade in over 4 seconds
+            masterGain.gain.linearRampToValueAtTime(0.3, audioContext.currentTime + 4);
+        }
+
+        function stopAmbientSound() {
+            if (masterGain && audioContext) {
+                // Fade out over 2 seconds
+                masterGain.gain.linearRampToValueAtTime(0, audioContext.currentTime + 2);
+
+                setTimeout(() => {
+                    oscillators.forEach(({ osc, lfo }) => {
+                        osc.stop();
+                        lfo.stop();
+                    });
+                    if (noiseSource) {
+                        noiseSource.stop();
+                    }
+                    oscillators = [];
+                    if (audioContext.state !== 'closed') {
+                        audioContext.close();
+                    }
+                }, 2100);
+            }
+        }
+
+        soundToggle.addEventListener('click', () => {
+            if (!isPlaying) {
+                createAmbientSound();
+                soundToggle.textContent = '🔊 Ambient Sound Active';
+                soundToggle.classList.add('active');
+                isPlaying = true;
+            } else {
+                stopAmbientSound();
+                soundToggle.textContent = '🔇 Activate Ambient Sound';
+                soundToggle.classList.remove('active');
+                isPlaying = false;
+            }
+        });
+
+        // Log image loading errors for debugging
+        document.querySelectorAll('img').forEach(img => {
+            img.addEventListener('error', function() {
+                console.warn('Failed to load image:', this.src);
+            });
+            img.addEventListener('load', function() {
+                console.log('Successfully loaded:', this.src);
+            });
+        });
+    </script>
+</body>
+</html>

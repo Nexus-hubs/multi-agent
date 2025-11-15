@@ -1,0 +1,52 @@
+⟡ multi-agent systems, illuminated
+(background.png)
+
+the soft beige starburst on a dark field introduces the site. it represents the spark of coordination: many simple lines radiating outward yet anchored in a single origin. this is the essence of a multi-agent system. instead of one oversized model doing everything, we orchestrate several focused agents that collaborate with precision.
+
+✦ the user at the center
+(user.png)
+
+the beige user icon marks the anchor of the entire system. every agent, connector, workflow and safeguard exists to serve this single point. the experience begins with your intent. from that intent, the agents negotiate how to achieve your goal, always maintaining clarity, control and transparency.
+
+❖ planner, executor, validator – the core loop
+(multi agents.png)
+
+the vertical diagram shows the planner, executor and validator, linked in sequence. to the side, a small sub-agent symbol and a tools panel illustrate how actions are dispatched. this section explains the loop: the planner breaks down your request, the executor performs the actions or tool calls, and the validator ensures correctness before returning results. this triad mirrors real-world workflows and reduces errors.
+
+◈ mcp as the connective tissue
+(mcp.png)
+
+the looping beige line represents the model context protocol. it symbolizes how external tools, apis and systems connect to agents in a clean and secure structure. mcp exposes tools, resources and capabilities in a standard form that the planner can reason about, the executor can call, and the validator can review.
+
+✦ trust, encryption and secure boundaries
+(encryption.png)
+(security.png)
+
+the lock-with-star icon emphasizes least-privilege access and visibility into tool calls. the shield icon reinforces systemic protection: encrypted communication, controlled permissions, and strict boundaries around mcp servers. these images frame the security model that underpins every agent action.
+
+❖ governance, checklists and guardrails
+(file.png)
+
+the beige checklist page icon illustrates operational discipline. each workflow is governed by constraints: allowed data, tool scopes, approval steps, and fallback logic. the validator agent uses these rules to determine whether outputs are acceptable or whether the loop must run again.
+
+◈ perspectives: engine vs dashboard
+(presentation.png)
+
+the paired rectangles represent dual perspectives. one is the deep system view used by engineers, showing agents, tools and logs. the other is a clear dashboard for business users. both perspectives observe the same workflows at different levels of abstraction.
+
+✦ reliability and repeatability
+(star beige.png)
+
+the symmetrical eight-spoke star symbolizes stable, repeatable behavior. when a workflow becomes reliable, it can be turned into a reusable skill that other teams call with confidence. the symmetry reflects deterministic, auditable execution.
+
+❖ background process: quiet orchestration
+(background (2).png)
+
+the minimal starburst floating in a large black field represents silent, unobtrusive orchestration. once configured, agents coordinate in the background while the user sees only meaningful summaries and requests for approval.
+
+◈ closing: humans and agents, working together
+(user.png again)
+
+the final image returns to the user icon, now conceptually surrounded by the lock, shield, mcp connector, checklist, star and planner–executor–validator loop. the closing message emphasizes partnership: agents handle complexity, humans set direction and approve actions.
+
+confidence 0.82

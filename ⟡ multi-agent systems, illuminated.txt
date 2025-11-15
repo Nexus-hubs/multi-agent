@@ -1,4 +1,4 @@
-⟡ multi-agent systems, illuminated
+⟡ multi-agent systems
 (background.png)
 
 the soft beige starburst on a dark field introduces the site. it represents the spark of coordination: many simple lines radiating outward yet anchored in a single origin. this is the essence of a multi-agent system. instead of one oversized model doing everything, we orchestrate several focused agents that collaborate with precision.
@@ -50,3 +50,4 @@ the minimal starburst floating in a large black field represents silent, unobtru
 the final image returns to the user icon, now conceptually surrounded by the lock, shield, mcp connector, checklist, star and planner–executor–validator loop. the closing message emphasizes partnership: agents handle complexity, humans set direction and approve actions.
 
 confidence 0.82
+

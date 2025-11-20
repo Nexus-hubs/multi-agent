@@ -477,31 +477,26 @@
             gainNode.gain.value = 0;
             gainNode.connect(audioContext.destination);
 
-            // Enhanced frequency palette for richer harmonics
+            // Minimal, gentle high frequencies only
             const frequencies = [
-                55,     // A1
-                82.41,  // E2
-                110,    // A2
-                165,    // E3
-                220,    // A3
-                329.63, // E4
-                440,    // A4
-                659.25  // E5
+                523.25, // C5
+                659.25, // E5
+                783.99  // G5
             ];
 
             frequencies.forEach((freq, index) => {
                 const osc = audioContext.createOscillator();
                 const oscGain = audioContext.createGain();
 
-                // Mix sine and triangle waves for warmth
-                osc.type = index % 2 === 0 ? 'sine' : 'triangle';
+                // Pure sine waves for smooth, gentle tones
+                osc.type = 'sine';
                 osc.frequency.value = freq;
 
-                // Set individual oscillator volumes
-                oscGain.gain.value = 0.06 / (index + 1);
+                // Very low volume
+                oscGain.gain.value = 0.015 / (index + 1);
 
-                // Add subtle detuning for organic feel
-                osc.detune.value = (Math.random() - 0.5) * 8;
+                // Minimal detuning
+                osc.detune.value = (Math.random() - 0.5) * 3;
 
                 osc.connect(oscGain);
                 oscGain.connect(gainNode);
@@ -509,28 +504,17 @@
                 osc.start();
                 oscillators.push({ osc, gain: oscGain });
 
-                // Add multiple LFOs for movement
+                // Gentle LFO for subtle movement
                 const lfo = audioContext.createOscillator();
                 const lfoGain = audioContext.createGain();
-                lfo.frequency.value = 0.08 + (Math.random() * 0.15);
-                lfoGain.gain.value = 0.012;
+                lfo.frequency.value = 0.05 + (Math.random() * 0.05);
+                lfoGain.gain.value = 0.005;
                 lfo.connect(lfoGain);
                 lfoGain.connect(oscGain.gain);
                 lfo.start();
-
-                // Add frequency modulation for shimmer
-                if (index > 3) {
-                    const fmOsc = audioContext.createOscillator();
-                    const fmGain = audioContext.createGain();
-                    fmOsc.frequency.value = 0.5;
-                    fmGain.gain.value = 2;
-                    fmOsc.connect(fmGain);
-                    fmGain.connect(osc.frequency);
-                    fmOsc.start();
-                }
             });
 
-            // Enhanced filtered noise for atmospheric texture
+            // Very subtle noise
             const bufferSize = 2 * audioContext.sampleRate;
             const noiseBuffer = audioContext.createBuffer(1, bufferSize, audioContext.sampleRate);
             const output = noiseBuffer.getChannelData(0);
@@ -544,30 +528,19 @@
             whiteNoise.loop = true;
 
             const noiseFilter = audioContext.createBiquadFilter();
-            noiseFilter.type = 'lowpass';
-            noiseFilter.frequency.value = 300;
-            noiseFilter.Q.value = 2;
+            noiseFilter.type = 'highpass';
+            noiseFilter.frequency.value = 2000;
 
             const noiseGain = audioContext.createGain();
-            noiseGain.gain.value = 0.02;
+            noiseGain.gain.value = 0.003;
 
             whiteNoise.connect(noiseFilter);
             noiseFilter.connect(noiseGain);
             noiseGain.connect(gainNode);
             whiteNoise.start();
 
-            // Add subtle reverb-like delay
-            const delay = audioContext.createDelay();
-            const delayGain = audioContext.createGain();
-            delay.delayTime.value = 0.3;
-            delayGain.gain.value = 0.15;
-
-            gainNode.connect(delay);
-            delay.connect(delayGain);
-            delayGain.connect(gainNode);
-
-            // Smooth fade in
-            gainNode.gain.linearRampToValueAtTime(0.3, audioContext.currentTime + 4);
+            // Very gentle fade in to low volume
+            gainNode.gain.linearRampToValueAtTime(0.08, audioContext.currentTime + 5);
         }
 
         function stopAmbientSound() {

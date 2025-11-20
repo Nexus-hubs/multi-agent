@@ -81,58 +81,16 @@
             right: 0;
             bottom: 0;
             background: radial-gradient(circle at 50% 50%, rgba(212, 197, 176, 0.05) 0%, transparent 70%);
-            animation: pulse 8s ease-in-out infinite;
+            opacity: 0.5;
             pointer-events: none;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 0.3; transform: scale(1); }
-            50% { opacity: 0.6; transform: scale(1.05); }
-        }
-
-        /* Floating particles */
-        .particle {
-            position: fixed;
-            width: 2px;
-            height: 2px;
-            background: var(--accent-beige);
-            border-radius: 50%;
-            pointer-events: none;
-            opacity: 0;
-            animation: float 25s infinite ease-in-out;
-            box-shadow: 0 0 4px rgba(212, 197, 176, 0.2);
-        }
-
-        @keyframes float {
-            0% {
-                transform: translateY(100vh) translateX(0) scale(0);
-                opacity: 0;
-            }
-            10% {
-                opacity: 0.2;
-            }
-            90% {
-                opacity: 0.2;
-            }
-            100% {
-                transform: translateY(-100vh) translateX(50px) scale(1);
-                opacity: 0;
-            }
         }
 
         .hero-image {
             max-width: 300px;
             margin-bottom: 3rem;
             opacity: 0;
-            animation: fadeIn 1.5s ease-out forwards, float-gentle 6s ease-in-out infinite;
+            animation: fadeIn 1.5s ease-out forwards;
             filter: drop-shadow(0 0 40px rgba(212, 197, 176, 0.3));
-            transition: transform 0.3s ease-out;
-            transform-style: preserve-3d;
-        }
-
-        @keyframes float-gentle {
-            0%, 100% { transform: translateY(0px) rotate(0deg); }
-            50% { transform: translateY(-10px) rotate(1deg); }
         }
 
         @keyframes fadeIn {
@@ -209,13 +167,11 @@
             width: 100%;
             border-radius: 1rem;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-            transition: transform 0.4s ease, box-shadow 0.3s ease;
+            transition: box-shadow 0.3s ease;
             border: 1px solid rgba(212, 197, 176, 0.1);
-            cursor: pointer;
         }
 
         .content-image:hover {
-            transform: translateY(-8px) scale(1.01);
             box-shadow: 0 25px 70px rgba(212, 197, 176, 0.15), 0 0 20px rgba(212, 197, 176, 0.08);
         }
 
@@ -266,6 +222,26 @@
 
             .image-duo {
                 grid-template-columns: 1fr;
+            }
+
+            /* Disable all motion effects on mobile */
+            .content-image:hover {
+                box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            }
+
+            .section-icon:hover {
+                transform: none;
+            }
+        }
+
+        /* Respect user's motion preferences */
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
             }
         }
 
@@ -470,114 +446,28 @@
     </footer>
 
     <script>
-        // Create floating particles
-        function createParticles() {
-            const particleCount = 6;
-            const container = document.body;
-
-            for (let i = 0; i < particleCount; i++) {
-                const particle = document.createElement('div');
-                particle.className = 'particle';
-                particle.style.left = Math.random() * 100 + '%';
-                particle.style.animationDelay = Math.random() * 25 + 's';
-                particle.style.animationDuration = (20 + Math.random() * 15) + 's';
-                container.appendChild(particle);
-            }
-        }
-
-        // Initialize particles
-        createParticles();
-
-        // Subtle 3D tilt effect for images
-        document.querySelectorAll('.content-image').forEach(img => {
-            img.addEventListener('mousemove', (e) => {
-                const rect = img.getBoundingClientRect();
-                const x = e.clientX - rect.left;
-                const y = e.clientY - rect.top;
-
-                const centerX = rect.width / 2;
-                const centerY = rect.height / 2;
-
-                const rotateX = (y - centerY) / 30;
-                const rotateY = (centerX - x) / 30;
-
-                img.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-8px) scale(1.01)`;
-            });
-
-            img.addEventListener('mouseleave', () => {
-                img.style.transform = '';
-            });
-        });
-
-        // Subtle hero image parallax
-        const heroImage = document.querySelector('.hero-image');
-        document.addEventListener('mousemove', (e) => {
-            const x = (e.clientX / window.innerWidth - 0.5) * 8;
-            const y = (e.clientY / window.innerHeight - 0.5) * 8;
-
-            if (heroImage && window.scrollY < window.innerHeight) {
-                heroImage.style.transform = `translate(${x}px, ${y}px)`;
-            }
-        });
-
-        // Intersection Observer for scroll animations with stagger
+        // Intersection Observer for scroll animations
         const observer = new IntersectionObserver((entries) => {
-            entries.forEach((entry, index) => {
+            entries.forEach(entry => {
                 if (entry.isIntersecting) {
-                    setTimeout(() => {
-                        entry.target.classList.add('visible');
-                    }, index * 100);
+                    entry.target.classList.add('visible');
                 }
             });
         }, {
-            threshold: 0.1,
-            rootMargin: '0px 0px -50px 0px'
+            threshold: 0.1
         });
 
         document.querySelectorAll('section').forEach(section => {
             observer.observe(section);
         });
 
-        // Enhanced Web Audio API for ambient sound with interactions
+        // Web Audio API for ambient sound
         let audioContext;
         let oscillators = [];
         let gainNode;
         let isPlaying = false;
-        let lastScrollTime = 0;
 
         const soundToggle = document.getElementById('soundToggle');
-
-        // Create UI interaction sounds
-        function playTone(frequency, duration = 0.1, type = 'sine') {
-            if (!audioContext || !isPlaying) return;
-
-            const osc = audioContext.createOscillator();
-            const gain = audioContext.createGain();
-
-            osc.type = type;
-            osc.frequency.value = frequency;
-
-            gain.gain.setValueAtTime(0.08, audioContext.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
-
-            osc.connect(gain);
-            gain.connect(audioContext.destination);
-
-            osc.start(audioContext.currentTime);
-            osc.stop(audioContext.currentTime + duration);
-        }
-
-        // Scroll sound effect (subtle)
-        let scrollTimeout;
-        window.addEventListener('scroll', () => {
-            const now = Date.now();
-            if (now - lastScrollTime > 500) {
-                const scrollPercent = window.scrollY / (document.documentElement.scrollHeight - window.innerHeight);
-                const frequency = 200 + (scrollPercent * 150);
-                playTone(frequency, 0.03, 'sine');
-                lastScrollTime = now;
-            }
-        });
 
         function createAmbientSound() {
             audioContext = new (window.AudioContext || window.webkitAudioContext)();
@@ -703,38 +593,12 @@
                 soundToggle.textContent = '🔊 Ambient Sound Active';
                 soundToggle.classList.add('active');
                 isPlaying = true;
-                playTone(440, 0.2, 'sine');
             } else {
                 stopAmbientSound();
                 soundToggle.textContent = '🔇 Activate Ambient Sound';
                 soundToggle.classList.remove('active');
                 isPlaying = false;
             }
-        });
-
-        // Add hover sounds to images
-        document.querySelectorAll('.content-image').forEach((img, index) => {
-            img.addEventListener('mouseenter', () => {
-                const frequency = 400 + (index * 50);
-                playTone(frequency, 0.15, 'sine');
-            });
-
-            img.addEventListener('click', () => {
-                playTone(550, 0.3, 'triangle');
-            });
-        });
-
-        // Add hover sound to section icons
-        document.querySelectorAll('.section-icon').forEach((icon, index) => {
-            icon.addEventListener('mouseenter', () => {
-                const frequency = 500 + (index * 40);
-                playTone(frequency, 0.12, 'sine');
-            });
-        });
-
-        // Sound toggle button hover
-        soundToggle.addEventListener('mouseenter', () => {
-            playTone(660, 0.1, 'sine');
         });
 
         // Smooth scrolling for internal links

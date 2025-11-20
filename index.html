@@ -34,33 +34,6 @@
             overflow-x: hidden;
         }
 
-        .sound-toggle {
-            position: fixed;
-            top: 2rem;
-            right: 2rem;
-            z-index: 1000;
-            background: rgba(212, 197, 176, 0.1);
-            border: 1px solid var(--accent-beige);
-            color: var(--accent-beige);
-            padding: 0.75rem 1.5rem;
-            border-radius: 2rem;
-            cursor: pointer;
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 0.9rem;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(10px);
-        }
-
-        .sound-toggle:hover {
-            background: rgba(212, 197, 176, 0.2);
-            transform: translateY(-2px);
-        }
-
-        .sound-toggle.active {
-            background: var(--accent-beige);
-            color: var(--bg-dark);
-        }
-
         .hero {
             min-height: 100vh;
             display: flex;
@@ -213,13 +186,6 @@
                 --spacing-lg: 2rem;
             }
 
-            .sound-toggle {
-                top: 1rem;
-                right: 1rem;
-                padding: 0.5rem 1rem;
-                font-size: 0.8rem;
-            }
-
             .image-duo {
                 grid-template-columns: 1fr;
             }
@@ -272,8 +238,6 @@
     </style>
 </head>
 <body>
-    <button class="sound-toggle" id="soundToggle">🔇 Activate Ambient Sound</button>
-
     <div class="hero">
         <img src="STAR beige.png" alt="Starburst representing multi-agent coordination" class="hero-image">
         <h1>⟡ Multi-Agent Systems</h1>
@@ -459,119 +423,6 @@
 
         document.querySelectorAll('section').forEach(section => {
             observer.observe(section);
-        });
-
-        // Web Audio API for ambient sound
-        let audioContext;
-        let oscillators = [];
-        let gainNode;
-        let isPlaying = false;
-
-        const soundToggle = document.getElementById('soundToggle');
-
-        function createAmbientSound() {
-            audioContext = new (window.AudioContext || window.webkitAudioContext)();
-
-            // Create master gain
-            gainNode = audioContext.createGain();
-            gainNode.gain.value = 0;
-            gainNode.connect(audioContext.destination);
-
-            // Minimal, gentle high frequencies only
-            const frequencies = [
-                523.25, // C5
-                659.25, // E5
-                783.99  // G5
-            ];
-
-            frequencies.forEach((freq, index) => {
-                const osc = audioContext.createOscillator();
-                const oscGain = audioContext.createGain();
-
-                // Pure sine waves for smooth, gentle tones
-                osc.type = 'sine';
-                osc.frequency.value = freq;
-
-                // Very low volume
-                oscGain.gain.value = 0.015 / (index + 1);
-
-                // Minimal detuning
-                osc.detune.value = (Math.random() - 0.5) * 3;
-
-                osc.connect(oscGain);
-                oscGain.connect(gainNode);
-
-                osc.start();
-                oscillators.push({ osc, gain: oscGain });
-
-                // Gentle LFO for subtle movement
-                const lfo = audioContext.createOscillator();
-                const lfoGain = audioContext.createGain();
-                lfo.frequency.value = 0.05 + (Math.random() * 0.05);
-                lfoGain.gain.value = 0.005;
-                lfo.connect(lfoGain);
-                lfoGain.connect(oscGain.gain);
-                lfo.start();
-            });
-
-            // Very subtle noise
-            const bufferSize = 2 * audioContext.sampleRate;
-            const noiseBuffer = audioContext.createBuffer(1, bufferSize, audioContext.sampleRate);
-            const output = noiseBuffer.getChannelData(0);
-
-            for (let i = 0; i < bufferSize; i++) {
-                output[i] = Math.random() * 2 - 1;
-            }
-
-            const whiteNoise = audioContext.createBufferSource();
-            whiteNoise.buffer = noiseBuffer;
-            whiteNoise.loop = true;
-
-            const noiseFilter = audioContext.createBiquadFilter();
-            noiseFilter.type = 'highpass';
-            noiseFilter.frequency.value = 2000;
-
-            const noiseGain = audioContext.createGain();
-            noiseGain.gain.value = 0.003;
-
-            whiteNoise.connect(noiseFilter);
-            noiseFilter.connect(noiseGain);
-            noiseGain.connect(gainNode);
-            whiteNoise.start();
-
-            // Very gentle fade in to low volume
-            gainNode.gain.linearRampToValueAtTime(0.08, audioContext.currentTime + 5);
-        }
-
-        function stopAmbientSound() {
-            if (gainNode && audioContext) {
-                // Fade out
-                gainNode.gain.linearRampToValueAtTime(0, audioContext.currentTime + 2);
-
-                setTimeout(() => {
-                    oscillators.forEach(({ osc }) => {
-                        osc.stop();
-                    });
-                    oscillators = [];
-                    if (audioContext.state !== 'closed') {
-                        audioContext.close();
-                    }
-                }, 2000);
-            }
-        }
-
-        soundToggle.addEventListener('click', () => {
-            if (!isPlaying) {
-                createAmbientSound();
-                soundToggle.textContent = '🔊 Ambient Sound Active';
-                soundToggle.classList.add('active');
-                isPlaying = true;
-            } else {
-                stopAmbientSound();
-                soundToggle.textContent = '🔇 Activate Ambient Sound';
-                soundToggle.classList.remove('active');
-                isPlaying = false;
-            }
         });
 
         // Smooth scrolling for internal links
